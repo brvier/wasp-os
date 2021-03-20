@@ -92,10 +92,11 @@ class NotificationApp(PagerApp):
     def foreground(self):
         notes = wasp.system.notifications
         note = notes.pop(next(iter(notes)))
-        title = note["title"] if "title" in note else (note["subject"] if "subject" in note else "Untitled")
-        tel = note["tel"] if "tel" in note else ""
+        title = note["title"] if "title" in note else "Untitled"
+        if title == "Untitled" and "sender" in note:
+            title = note["sender"]
         body = note["body"] if "body" in note else ""
-        self._msg = "{}\n{}\n{}".format(title, tel, body)
+        self._msg = "{}\n\n{}".format(title, body)
 
         wasp.system.request_event(wasp.EventMask.TOUCH)
         super().foreground()
