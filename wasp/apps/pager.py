@@ -11,9 +11,33 @@ information when applications crash.
 
 import wasp
 import icons
-
+import fonts
 import io
 import sys
+
+phone_icon = (
+    b"\x02"
+    b"@@"
+    b"?\xff\xff-@\x15AAAAAEAA1A"
+    b"AAAJAA-AAAOA+AAA"
+    b"QA)AAASA(AAUA&AA"
+    b'WA%AAXA#AAAYA"AA'
+    b"FAAAAQA!AAFAA\x02AA"
+    b"PA AAFAA\x04AAOA\x1fAA"
+    b"EAA\x07AANA\x1eAAEAA\tA"
+    b"AMA\x1dAAEAA\x0bAAKAA\x1c"
+    b"AAEAA\rAABABAAAAA"
+    b"\x1dAAEAA7AEAA7AEAA"
+    b"7AADAA7AADAA8AEA"
+    b"8AADA\x80#\x817\x81ADAA8A"
+    b"EA8AADA9AEA8AAEA"
+    b"A7AGAA6AIAA3AAJA"
+    b"A2ALAA1AMA0AAMA0"
+    b"ANA0ANA0ANA0ANA0"
+    b"ANA0ANA0ANA0ANA0"
+    b"ANA0ANA0AALAA1AA"
+    b"BADABAA?\xff\xff+"
+)
 
 
 class PagerApp:
@@ -92,10 +116,10 @@ class NotificationApp(PagerApp):
     def foreground(self):
         notes = wasp.system.notifications
         note = notes.pop(next(iter(notes)))
-        title = note["title"] if "title" in note else (note["subject"] if "subject" in note else "Untitled")
-        tel = note["tel"] if "tel" in note else ""
-        body = note["body"] if "body" in note else ""
-        self._msg = "{}\n{}\n{}".format(title, tel, body)
+
+        self._title = note["title"] if "title" in note else "Untitled"
+        self._src = note["src"] if "src" in note else ""
+        self._body = note["body"] if "body" in note else ""
 
         wasp.system.request_event(wasp.EventMask.TOUCH)
         super().foreground()
@@ -110,6 +134,9 @@ class NotificationApp(PagerApp):
                 self.confirmation_view.active = False
                 self._draw()
                 return
+            # if (event[0] == wasp.EventType.LEFT) or (event[0] == wasp.EventType.RIGHT):
+            #    self.foreground()
+            #    return
         else:
             if event[0] == wasp.EventType.DOWN and self._page == 0:
                 self.confirmation_view.draw("Clear notifications?")
@@ -124,6 +151,37 @@ class NotificationApp(PagerApp):
                 wasp.system.navigate(wasp.EventType.BACK)
             else:
                 self._draw()
+
+    def _draw(self):
+        """Draw the display from scratch."""
+        mute = wasp.watch.display.mute
+        draw = wasp.watch.drawable
+
+        mute(True)
+        draw.set_color(0xFFFF)
+        draw.fill()
+
+        if self._src == "call":
+            draw.blit(phone_icon, 94, 10)
+            s = 70
+        else:
+            s = 10
+            self._body = self._body
+
+        draw.set_font(fonts.sans24)
+        src_idx = draw.wrap(self._src, 240)
+        title_idx = draw.wrap(self._title, 240)
+        draw.string(self._src[src_idx[0] : src_idx[1]], 0, s, width=240)
+        draw.string(self._title[title_idx[0] : title_idx[1]], 0, s + 30, width=240)
+        draw.set_font(fonts.sans24)
+        s += 80
+        chunks = draw.wrap(self._body, 240)
+        for i in range(len(chunks) - 1):
+            sub = self._body[chunks[i] : chunks[i + 1]]
+            if s + 24 * i > 216:
+                break
+            draw.string(sub, 0, s + 24 * i, width=240)
+        mute(False)
 
 
 class CrashApp:
