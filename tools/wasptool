@@ -359,6 +359,9 @@ if __name__ == '__main__':
             help='Copy the specified file to the wasp-os device')
     parser.add_argument('--verbose', action='store_true',
             help='Log interaction with the wasp-os device')
+    parser.add_argument('--disconnect', action='store_true',
+            help='force disconnect with the wasp-os device')
+
 
     args = parser.parse_args()
 
@@ -442,4 +445,6 @@ if __name__ == '__main__':
         handle_reset(console, ota=True)
         sys.exit(0)
 
+    if args.disconnect:
+        console.device.disconnect()
     console.unsync()

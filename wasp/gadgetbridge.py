@@ -54,6 +54,19 @@ def GB(cmd):
             if wasp.system.sleep_at == None:
                 wasp.system.wake()
                 wasp.system.switch(wasp.system.notifier)
+        elif task == "call":
+            if "incoming" in cmd["cmd"]:
+                cmd["src"] = "call"
+                if "name" in cmd:
+                    cmd["title"] = cmd["name"]
+                if "number" in cmd:
+                    cmd["body"] = cmd["number"]
+                wasp.system.notify(0, cmd)
+                wasp.watch.vibrator.pulse(ms=wasp.system.notify_duration)
+                if wasp.system.sleep_at == None:
+                    wasp.system.wake()
+                    wasp.system.switch(wasp.system.notifier)
+
         elif task == "notify-":
             wasp.system.unnotify(cmd["id"])
         elif task == "musicstate":
@@ -61,8 +74,8 @@ def GB(cmd):
         elif task == "musicinfo":
             wasp.system.set_music_info(cmd)
         else:
-            pass
-            # _info('Command "{}" is not implemented'.format(cmd))
+            _info('Command {} "{}" is not implemented'.format(task, cmd))
+            # pass
     except Exception as e:
         msg = io.StringIO()
         sys.print_exception(e, msg)
