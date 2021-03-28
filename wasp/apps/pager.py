@@ -121,8 +121,14 @@ class NotificationApp(PagerApp):
         self._src = note["src"] if "src" in note else ""
         self._body = note["body"] if "body" in note else ""
 
+        if self._src == "call":
+            wasp.system.request_tick(1000)
+
         wasp.system.request_event(wasp.EventMask.TOUCH)
         super().foreground()
+
+    def tick(self, ticks):
+        wasp.watch.vibrator.pulse(ms=wasp.system.notify_duration)
 
     def background(self):
         self.confirmation_view.active = False
@@ -217,7 +223,9 @@ class CrashApp:
         draw.blit(icons.bomb, 0, 104)
         draw.blit(icons.bomb, 32, 104)
 
-        wasp.system.request_event(wasp.EventMask.SWIPE_UPDOWN | wasp.EventMask.SWIPE_LEFTRIGHT)
+        wasp.system.request_event(
+            wasp.EventMask.SWIPE_UPDOWN | wasp.EventMask.SWIPE_LEFTRIGHT
+        )
 
     def background(self):
         """Restore a normal display mode.

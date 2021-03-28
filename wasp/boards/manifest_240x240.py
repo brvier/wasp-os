@@ -4,6 +4,7 @@
 
 manifest = (
     "apps/alarm.py",
+    "apps/actclock.py",
     "apps/calc.py",
     "apps/clock.py",
     "apps/chrono.py",

@@ -55,7 +55,8 @@ def GB(cmd):
                 wasp.system.wake()
                 wasp.system.switch(wasp.system.notifier)
         elif task == "call":
-            if "incoming" in cmd["cmd"]:
+            if "accept" in cmd["cmd"]:
+                _info('Running {} "{}"'.format(task, cmd))
                 cmd["src"] = "call"
                 if "name" in cmd:
                     cmd["title"] = cmd["name"]

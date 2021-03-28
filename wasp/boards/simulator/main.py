@@ -6,6 +6,8 @@ import wasp
 # Test app is used a lot on the simulator. Let's make sure it is
 # registered by default.
 wasp.system.register("apps.testapp.TestApp")
+# wasp.system.register("apps.actclock.ActClockApp")
+
 
 # Ensure there's something interesting to look at ;-)
 wasp.system.set_music_info(
@@ -19,9 +21,10 @@ wasp.system.blank_after = 300
 
 # Instantiate the analogue clock application and replace the default
 # (digital) clock with this alternative.
-# from chrono import ChronoApp
+# from apps.actclock import ActClockApp
+
 # clock = wasp.system.quick_ring[0]
-# wasp.system.quick_ring[0] = ChronoApp()
+# wasp.system.quick_ring[0] = ActClockApp()
 # wasp.system.switch(wasp.system.quick_ring[0])
 # wasp.system.register(clock)
 

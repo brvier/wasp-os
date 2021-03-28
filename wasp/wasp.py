@@ -29,6 +29,7 @@ from apps.settings import SettingsApp
 from apps.steps import StepCounterApp
 from apps.software import SoftwareApp
 from apps.stopwatch import StopwatchApp
+from apps.actclock import ActClockApp
 
 
 class EventType:
@@ -141,8 +142,8 @@ class Manager:
         self.blank_after = 15
 
         self._alarms = []
-        self._brightness = 2
-        self._notifylevel = 2
+        self._brightness = 3
+        self._notifylevel = 3
         if "P8" in watch.os.uname().machine:
             self._nfylevels = [0, 225, 450]
         else:
@@ -154,7 +155,13 @@ class Manager:
         self._scheduling = False
 
         # TODO: Eventually these should move to main.py
-        for app, qr in ((ClockApp, True), (StepCounterApp, True), (StopwatchApp, True), (HeartApp, True), (SoftwareApp, False), (SettingsApp, False)):
+        for app, qr in (
+            (ActClockApp, True),
+            # (StepCounterApp, False),
+            # (HeartApp, False),
+            (SoftwareApp, False),
+            (SettingsApp, False),
+        ):
             try:
                 a = app()
 
@@ -406,7 +413,9 @@ class Manager:
 
         if event[0] < 5:
             updown = event[0] == 1 or event[0] == 2
-            if (bool(event_mask & EventMask.SWIPE_UPDOWN) and updown) or (bool(event_mask & EventMask.SWIPE_LEFTRIGHT) and not updown):
+            if (bool(event_mask & EventMask.SWIPE_UPDOWN) and updown) or (
+                bool(event_mask & EventMask.SWIPE_LEFTRIGHT) and not updown
+            ):
                 if self.app.swipe(event):
                     self.navigate(event[0])
             else:
@@ -459,7 +468,10 @@ class Manager:
 
             gc.collect()
         else:
-            if 1 == self._button.get_event() or self._charging != watch.battery.charging():
+            if (
+                1 == self._button.get_event()
+                or self._charging != watch.battery.charging()
+            ):
                 self.wake()
 
     def run(self, no_except=True):
@@ -544,7 +556,19 @@ class Manager:
 
     def theme(self, theme_part: str) -> int:
         """Returns the relevant part of theme. For more see ../tools/themer.py"""
-        theme_parts = ("ble", "scroll-indicator", "battery", "status-clock", "notify-icon", "bright", "mid", "ui", "spot1", "spot2", "contrast")
+        theme_parts = (
+            "ble",
+            "scroll-indicator",
+            "battery",
+            "status-clock",
+            "notify-icon",
+            "bright",
+            "mid",
+            "ui",
+            "spot1",
+            "spot2",
+            "contrast",
+        )
         if theme_part not in theme_parts:
             raise IndexError("Theme part {} does not exist".format(theme_part))
         idx = theme_parts.index(theme_part) * 2
